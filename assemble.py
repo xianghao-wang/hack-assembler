@@ -1,5 +1,6 @@
 import re
 
+# codes for jump condition
 JMP_CODES = {
     'JGT': '001',
     'JEQ': '010',
@@ -10,6 +11,7 @@ JMP_CODES = {
     'JMP': '111'
 }
 
+# codes for computation
 COMP_CODES = {
     '0': '101010',
     '1': '111111',
