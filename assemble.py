@@ -34,10 +34,12 @@ COMP_CODES = {
 }
 
 
-# remove all white characters and comments
-def purify(line: str):
+# remove all white characters and comments and white lines
+def purify(lines: [str]):
     pattern = '\\s|(//.*)'
-    return re.sub(pattern, '', line)
+    return list(filter(lambda item: len(item) != 0, [
+        re.sub(pattern, '', item) for item in lines
+    ]))
 
 
 # assemble A instruction
@@ -72,15 +74,7 @@ def asm_c(instruction: str):
 
 
 def test(source, dest):
-    with open(source) as f, open(dest, 'w') as g:
-        for line in f:
-            line = purify(line)
-            if len(line) == 0:
-                continue
-            if '@' in line:
-                g.write(asm_a(line) + '\n')
-            else:
-                g.write(asm_c(line) + '\n')
+    pass
 
 
 if __name__ == '__main__':
