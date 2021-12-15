@@ -33,6 +33,8 @@ COMP_CODES = {
     'D|A': '010101', 'D|M': '010101'
 }
 
+MEMORY_BEGIN = 32  # the begin of free memory address
+
 
 # remove all white characters and comments and white lines
 def purify(lines: [str]):
@@ -73,9 +75,43 @@ def asm_c(instruction: str):
     return '111' + comp_code + des_code + jump_code
 
 
+# analyse codes to replace symbols with actual values
+def analyse(lines: [str]):
+    line_count = 0
+    addr = MEMORY_BEGIN
+    symbols = {}
+    # scan for find symbols
+    for line in lines:
+        if line[0] == '(' and line[-1] == ')':  # detect a label
+            symbols[line[1:-1]] = line_count
+            continue
+
+        if line[0] == '@' and not line[1:].isdigit() and line[1:] not in symbols:  # detect a variable
+            symbols[line[1:]] = addr
+            addr += 1
+        line_count += 1
+
+    # scan for replacing symbol with address
+    return [
+        f'@{symbols[line[1:]]}' if line[0] == '@' else line
+        for line in lines if '(' not in line
+    ]
+
+
+# assemble to machine codes
+def assemble(lines: [str]):
+    return [
+        asm_a(line) if line[0] == '@' else asm_c(line)
+        for line in lines
+    ]
+
+
 def test(source, dest):
-    pass
+    with open(source) as fin, open(dest, 'w') as fout:
+        lines = analyse(purify(list(fin)))
+        for line in lines:
+            fout.write(line + '\n')
 
 
 if __name__ == '__main__':
-    test('test.asm', 'test.hack')
+    test('test.asm', 'test.o')
